@@ -257,6 +257,21 @@ return [
             'url'  => '/notacredito/create',
             'icon' => 'fas fa-fw fa-user',
         ],
+        [
+            'text' => 'nd',
+            'url'  => '/notadebito/create',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+        [
+            'text' => 'envioresumen',
+            'url'  => '/envioresumen/create',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+        [
+            'text' => 'enviobaja',
+            'url'  => '/enviobaja/create',
+            'icon' => 'fas fa-fw fa-user',
+        ],
     ],
 
     /*
@@ -377,5 +392,5 @@ return [
     | https://github.com/jeroennoten/Laravel-AdminLTE/wiki/9.-Other-Configuration
     */
 
-    'livewire' => false,
+    'livewire' => true,
 ];

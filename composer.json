@@ -20,7 +20,8 @@
         "livewire/livewire": "^2.0",
         "robrichards/xmlseclibs": "^3.1",
         "selective/xmldsig": "^2.0",
-        "ext-zip": "*"
+        "ext-zip": "*",
+      "ext-openssl": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

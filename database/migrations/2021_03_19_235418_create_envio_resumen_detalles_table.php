@@ -3,31 +3,28 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\TableInfo\EnvioResumenTableInfo;
+use App\TableInfo\EnvioResumenDetalleTableInfo;
+use App\TableInfo\VentaTableInfo;
 
 class CreateEnvioResumenDetallesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
+    private const TABLA_ENVIO_RESUMEN_DETALLE = EnvioResumenDetalleTableInfo::NOMBRE_TABLA;
+    private const TABLA_ENVIO_RESUMEN = EnvioResumenTableInfo::NOMBRE_TABLA;
+    private const TABLA_VENTA = VentaTableInfo::NOMBRE_TABLA;
+
     public function up()
     {
-        Schema::create('envio_resumen_detalles', function (Blueprint $table) {
-            $table->id();
-//            $table->foreignId('envio_resumens_id')->constrained('envio_resumens')->nullable();
-//            $table->foreignId('ventas_id')->constrained('ventas')->nullable();
-            $table->smallInteger('condicion')->nullable();
+        Schema::create(self::TABLA_ENVIO_RESUMEN_DETALLE, function (Blueprint $table) {
+            $table->id(EnvioResumenDetalleTableInfo::ID);
+            $table->foreignId(EnvioResumenDetalleTableInfo::ENVIO_RESUMEN)->nullable()->constrained(self::TABLA_ENVIO_RESUMEN);
+            $table->foreignId(EnvioResumenDetalleTableInfo::VENTA)->nullable()->constrained(self::TABLA_VENTA);
+            $table->smallInteger(EnvioResumenDetalleTableInfo::CONDICION)->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('envio_resumen_detalles');
+        Schema::dropIfExists(self::TABLA_ENVIO_RESUMEN_DETALLE);
     }
 }

@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comprobante;
 use App\Models\Emisor;
+use App\Models\Producto;
 use App\Models\TipoComprobante;
 use App\Models\TipoDocumento;
 use App\Models\TipoMoneda;
+use App\TableInfo\ComprobanteTableInfo;
+use App\TableInfo\TipoComprobanteTableInfo;
+use App\TableInfo\TipoDocumentoTableInfo;
 use App\Utils\ApiFacturacion;
 use App\Utils\CantidadEnLetras;
 use App\Utils\GeneradorXML;
@@ -18,9 +23,10 @@ class FacturaController extends Controller
     {
         $emisor = Emisor::all();
         $tipomoneda = TipoMoneda::all();
-        $tipocomprobante = TipoComprobante::all();
-        $tipodocumento = TipoDocumento::all();
-        return view('factura.create', compact('emisor', 'tipomoneda', 'tipocomprobante', 'tipodocumento'));
+        $tipocomprobante = TipoComprobante::where(TipoComprobanteTableInfo::ID, 1)->get();
+        $tipodocumento = TipoDocumento::where(TipoDocumentoTableInfo::ID, 3)->get();
+        $productos = Producto::all();
+        return view('factura.create', compact('emisor', 'tipomoneda', 'tipocomprobante', 'tipodocumento', 'productos'));
     }
 
     public function store(Request $request)

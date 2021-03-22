@@ -20,4 +20,7 @@ return [
     'factura'                       => 'Factura Electrónica',
     'boleta'                        => 'Boleta Electrónica',
     'nc'                            => 'Nota de Crédito',
+    'nd'                            => 'Nota de Débito',
+    'envioresumen'                  => 'Envío de Resumen',
+    'enviobaja'                     => 'Envío de Baja',
 ];

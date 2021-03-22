@@ -14,7 +14,6 @@ class GeneradorXML
         $doc->preserveWhiteSpace = TRUE;
         $doc->encoding = 'utf-8';
 
-        //crear el texto XML de la factura electronica
         $xml = '<?xml version="1.0" encoding="UTF-8"?>
         <Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2">
            <ext:UBLExtensions>
@@ -113,7 +112,6 @@ class GeneradorXML
                  </cac:TaxCategory>
               </cac:TaxSubtotal>';
 
-
         if($comprobante['total_opexoneradas']>0){
             $xml.='<cac:TaxSubtotal>
                     <cbc:TaxableAmount currencyID="'.$comprobante['moneda'].'">'.$comprobante['total_opexoneradas'].'</cbc:TaxableAmount>
@@ -195,7 +193,7 @@ class GeneradorXML
         }
 
         $xml.="</Invoice>";
-        Storage::disk('local')->put($nombrexml . '.xml', $xml);
+        Storage::disk('public')->put($nombrexml . '.xml', $xml);
         return $xml;
     }
 
@@ -382,14 +380,13 @@ class GeneradorXML
             </cac:CreditNoteLine>';
         }
         $xml.='</CreditNote>';
-        Storage::disk('local')->put($nombrexml . '.xml', $xml);
+        Storage::disk('public')->put($nombrexml . '.xml', $xml);
         return $xml;
     }
 
     function CrearXMLNotaDebito($nombrexml, $emisor, $cliente, $comprobante, $detalle)
     {
-
-        $doc = new DOMDocument();
+        $doc = new \DOMDocument();
         $doc->formatOutput = FALSE;
         $doc->preserveWhiteSpace = TRUE;
         $doc->encoding = 'utf-8';
@@ -541,14 +538,15 @@ class GeneradorXML
         }
 
         $xml.='</DebitNote>';
-
-        $doc->loadXML($xml);
-        $doc->save($nombrexml.'.XML');
+        Storage::disk('public')->put($nombrexml . '.xml', $xml);
+        return $xml;
+//        $doc->loadXML($xml);
+//        $doc->save($nombrexml.'.XML');
     }
 
     function CrearXMLResumenDocumentos($emisor, $cabecera, $detalle, $nombrexml)
     {
-        $doc = new DOMDocument();
+        $doc = new \DOMDocument();
         $doc->formatOutput = FALSE;
         $doc->preserveWhiteSpace = TRUE;
         $doc->encoding = 'utf-8';
@@ -634,9 +632,8 @@ class GeneradorXML
         }
 
         $xml.='</SummaryDocuments>';
-
-        $doc->loadXML($xml);
-        $doc->save($nombrexml.'.XML');
+        Storage::disk('public')->put($nombrexml . '.xml', $xml);
+        return $xml;
     }
 
     function CrearXmlBajaDocumentos($emisor, $cabecera, $detalle, $nombrexml)

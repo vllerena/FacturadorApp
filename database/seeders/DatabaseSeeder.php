@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             ComprobanteSeeder::class,
             VentaSeeder::class,
             VentaDetalleSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }

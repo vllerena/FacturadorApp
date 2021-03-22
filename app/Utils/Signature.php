@@ -8,12 +8,12 @@ use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class Signature
 {
-    public function signature_xml($flg_firma, $nombrexml, $ruta_certificado, $pass_certificado)
+    public function signature_xml($flg_firma, $ruta_xml_firmar, $ruta_certificado, $pass_certificado)
     {
         $doc = new \DOMDocument();
         $doc->formatOutput = FALSE;
         $doc->preserveWhiteSpace = TRUE;
-        $doc->loadXML(Storage::get('xml/'.$nombrexml.'.xml'));
+        $doc->load(('storage/'.$ruta_xml_firmar));
 
         $objDSig = new XMLSecurityDSig(FALSE);
         $objDSig->setCanonicalMethod(XMLSecurityDSig::EXC_C14N);
@@ -24,7 +24,7 @@ class Signature
         $objDSig->addReference($doc, XMLSecurityDSig::SHA1, array('http://www.w3.org/2000/09/xmldsig#enveloped-signature'), $options);
         $objKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, array('type' => 'private'));
 
-        $pfx = $ruta_certificado;
+        $pfx = file_get_contents($ruta_certificado);
         $key = array();
 
         openssl_pkcs12_read($pfx, $key, $pass_certificado);
@@ -39,11 +39,9 @@ class Signature
         $firma_cpe = $doc->getElementsByTagName('SignatureValue')->item(0)->nodeValue;
 
         $doc_string =$doc->saveXML();
-        Storage::disk('local')->put('xml/'.$nombrexml.'.xml', $doc_string);
+        Storage::disk('public')->put($ruta_xml_firmar, $doc_string);
         $resp['respuesta'] = 'ok';
         $resp['hash_cpe'] = $hash_cpe;
         $resp['firma_cpe'] = $firma_cpe;
-
-        return $resp;
     }
 }

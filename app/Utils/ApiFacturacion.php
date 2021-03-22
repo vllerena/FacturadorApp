@@ -9,28 +9,28 @@ class ApiFacturacion
 {
     public function EnviarComprobanteElectronico($emisor, $nombrexml, $rutacertificado="", $ruta_archivo_xml = "xml/", $ruta_archivo_cdr = "cdr/")
     {
-        $ruta = 'xml/' . $nombrexml;
+        $ruta = 'xml/'. $nombrexml;
         $flg_firma = 0;
         $nombrecertificado = 'LLAMA-PE-CERTIFICADO-DEMO-10724923530.pfx';
-        $ruta_xml_firmar = 'app/' . $ruta . '.xml';
-        $ruta_certificado = Storage::get('certificado/' . $nombrecertificado);
+        $ruta_xml_firmar = $ruta . '.xml';
+        $ruta_certificado = public_path('storage/certificado/' . $nombrecertificado);
         $pass_certificado = 'victor123';
 
         $signature = new Signature();
-        $signature->signature_xml($flg_firma, $nombrexml, $ruta_certificado, $pass_certificado);
+        $signature->signature_xml($flg_firma, $ruta_xml_firmar, $ruta_certificado, $pass_certificado);
 
         $zip = new ZipArchive;
         $nombrezip = $nombrexml . '.zip';
-        $rutazip = 'app/' . $ruta . '.zip';
+        $rutazip = $ruta_archivo_xml .  $nombrezip;
 
-        if ($zip->open(storage_path($rutazip), ZipArchive::CREATE) === TRUE)
+        if ($zip->open(public_path('storage/'. $rutazip), ZipArchive::CREATE) === TRUE)
         {
-            $zip->addFile(storage_path($ruta_xml_firmar), $nombrexml.'.xml');
+            $zip->addFile(public_path('storage/'. $ruta_xml_firmar), $nombrexml.'.xml');
             $zip->close();
         }
 
         $ws = 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService';
-        $contenido_del_zip = base64_encode(file_get_contents(storage_path($rutazip)));
+        $contenido_del_zip = base64_encode(file_get_contents(public_path('storage/'.$rutazip)));
 
         $xml_envio ='<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://service.sunat.gob.pe" xmlns:wsse="http://docs.oasisopen.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
                         <soapenv:Header>
@@ -70,7 +70,7 @@ class ApiFacturacion
 
         //para ejecutar los procesos de forma local en windows
         //enlace de descarga del cacert.pem https://curl.haxx.se/docs/caextract.html
-        curl_setopt($ch, CURLOPT_CAINFO, storage_path('app/certificado/cacert.pem')); //solo en local, si estas en el servidor web con ssl comentar esta línea
+        curl_setopt($ch, CURLOPT_CAINFO, storage_path('app/public/certificado/cacert.pem')); //solo en local, si estas en el servidor web con ssl comentar esta línea
 
         $response = curl_exec($ch); // ejecucion del llamado y respuesta del WS SUNAT.
 
@@ -87,7 +87,7 @@ class ApiFacturacion
                 $cdr = $doc->getElementsByTagName('applicationResponse')->item(0)->nodeValue; //guadarmos la respuesta(text-xml) en la variable
                 $cdr = base64_decode($cdr); //decodificando el xml
 
-                Storage::disk('local')->put('cdr/' . 'R-' . $nombrezip,  $cdr);
+                Storage::disk('public')->put('cdr/' . 'R-' . $nombrezip,  $cdr);
                 $zip = new ZipArchive();
                 if($zip->open('cdr/'. 'R-' . $nombrezip ) === true ) //rpta es identica existe el archivo
                 {
@@ -116,45 +116,33 @@ class ApiFacturacion
 
     }
 
-    public function EnviarResumenComprobantes($emisor,$nombre, $rutacertificado="", $ruta_archivo_xml = "xml/")
+    public function EnviarResumenComprobantes($emisor,$nombrexml, $rutacertificado="", $ruta_archivo_xml = "xml/")
     {
-        //firma del documento
+
+        $ruta = 'xml/'. $nombrexml;
+        $flg_firma = 0;
+        $nombrecertificado = 'LLAMA-PE-CERTIFICADO-DEMO-10724923530.pfx';
+        $ruta_xml_firmar = $ruta . '.xml';
+        $ruta_certificado = public_path('storage/certificado/' . $nombrecertificado);
+        $pass_certificado = 'victor123';
+
         $objSignature = new Signature();
+        $objSignature->signature_xml($flg_firma, $ruta_xml_firmar, $ruta_certificado, $pass_certificado);
 
-        $flg_firma = "0";
-        //$ruta_archivo_xml = "xml/";
-        $ruta = $ruta_archivo_xml.$nombre.'.XML';
+        $zip = new ZipArchive;
+        $nombrezip = $nombrexml . '.zip';
+        $rutazip = $ruta_archivo_xml .  $nombrezip;
 
-        $ruta_firma = $rutacertificado."certificado_prueba.pfx";
-        $pass_firma = "ceti";
-
-        $resp = $objSignature->signature_xml($flg_firma, $ruta, $ruta_firma, $pass_firma);
-
-        print_r($resp); //hash
-
-
-        //Generar el .zip
-
-        $zip = new ZipArchive();
-
-        $nombrezip = $nombre.".ZIP";
-        $rutazip = $ruta_archivo_xml.$nombre.".ZIP";
-
-        if($zip->open($rutazip,ZIPARCHIVE::CREATE)===true){
-            $zip->addFile($ruta, $nombre.'.XML');
+        if ($zip->open(public_path('storage/'. $rutazip), ZipArchive::CREATE) === TRUE)
+        {
+            $zip->addFile(public_path('storage/'. $ruta_xml_firmar), $nombrexml.'.xml');
             $zip->close();
         }
-
 
         //Enviamos el archivo a sunat
 
         $ws = "https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService";
-
-        $ruta_archivo = $ruta_archivo_xml.$nombrezip;
-        $nombre_archivo = $nombrezip;
-        $ruta_archivo_cdr = "cdr/";
-
-        $contenido_del_zip = base64_encode(file_get_contents($ruta_archivo));
+        $contenido_del_zip = base64_encode(file_get_contents(public_path('storage/'.$rutazip)));
 
 
         $xml_envio ='<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://service.sunat.gob.pe" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
@@ -168,7 +156,7 @@ class ApiFacturacion
 				 </soapenv:Header>
 				 <soapenv:Body>
 				 	<ser:sendSummary>
-				 		<fileName>'.$nombre_archivo.'</fileName>
+				 		<fileName>'.$nombrezip.'</fileName>
 				 		<contentFile>'.$contenido_del_zip.'</contentFile>
 				 	</ser:sendSummary>
 				 </soapenv:Body>
@@ -196,8 +184,7 @@ class ApiFacturacion
         curl_setopt($ch,CURLOPT_HTTPHEADER,$header);
         //para ejecutar los procesos de forma local en windows
         //enlace de descarga del cacert.pem https://curl.haxx.se/docs/caextract.html
-        curl_setopt($ch, CURLOPT_CAINFO, dirname(__FILE__)."/cacert.pem");
-
+        curl_setopt($ch, CURLOPT_CAINFO, storage_path('app/public/certificado/cacert.pem'));
 
         $response = curl_exec($ch);
 
@@ -318,8 +305,6 @@ class ApiFacturacion
             if(isset($doc->getElementsByTagName('content')->item(0)->nodeValue)){
                 $cdr = $doc->getElementsByTagName('content')->item(0)->nodeValue;
                 $cdr = base64_decode($cdr);
-
-
                 file_put_contents($ruta_archivo_cdr."R-".$nombre_archivo.".ZIP", $cdr);
 
                 $zip = new \ZipArchive();
