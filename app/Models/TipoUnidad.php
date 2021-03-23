@@ -17,4 +17,9 @@ class TipoUnidad extends Model
         TipoUnidadTableInfo::CODIGO,
         TipoUnidadTableInfo::DESCRIPCION,
     ];
+
+    public function producto()
+    {
+        return $this->hasMany(Producto::class);
+    }
 }

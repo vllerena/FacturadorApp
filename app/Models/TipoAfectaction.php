@@ -22,4 +22,9 @@ class TipoAfectaction extends Model
       TipoAfectacionTableInfo::NOMBRE_AFECTACION,
       TipoAfectacionTableInfo::TAG_AFECTACION,
     ];
+
+    public function producto()
+    {
+        return $this->hasMany(Producto::class);
+    }
 }

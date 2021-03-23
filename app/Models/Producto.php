@@ -21,4 +21,12 @@ class Producto extends Model
         ProductoTableInfo::TIPO_AFECTACION,
         ProductoTableInfo::TIPO_UNIDAD,
     ];
+
+    public function tipoafectacion(){
+        return $this->belongsTo(TipoAfectaction::class, ProductoTableInfo::TIPO_AFECTACION);
+    }
+
+    public function tipounidad(){
+        return $this->belongsTo(TipoUnidad::class, ProductoTableInfo::TIPO_UNIDAD);
+    }
 }

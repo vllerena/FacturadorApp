@@ -25,5 +25,4 @@
             <input class="form-control" type="text" value="{{$correlativo->correlativo}}" name="correlativo" />
         </div>
     @endif
-
 </div>
